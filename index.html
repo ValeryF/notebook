@@ -1,26 +1,214 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
-    <title>Простой блокнот</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dark Minimalist Notebook</title>
+    <!-- Font Awesome для иконок -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #1a1a1a;
+            --surface-color: #2d2d2d;
+            --primary-color: #7c4dff;
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 100%;
+            padding: 1rem;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid #404040;
+        }
+
+        .title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0;
+            color: var(--text-primary);
+        }
+
+        .input-area {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        #noteInput {
+            width: 100%;
+            min-height: 120px;
+            padding: 1.5rem;
+            background: var(--surface-color);
+            border: none;
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            line-height: 1.5;
+            resize: none;
+            transition: all 0.3s ease;
+        }
+
+        #noteInput:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px var(--primary-color);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            padding: 1rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            background: var(--surface-color);
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn:hover {
+            filter: brightness(1.1);
+            transform: translateY(-1px);
+        }
+
+        .notes-list {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .note {
+            background: var(--surface-color);
+            padding: 1.5rem;
+            border-radius: 12px;
+            position: relative;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .note-content {
+            margin: 0;
+            color: var(--text-primary);
+            line-height: 1.4;
+        }
+
+        .note-date {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        .note-actions {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .note-action {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            padding: 0.5rem;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .note-action:hover {
+            color: var(--primary-color);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0.5rem;
+            }
+            
+            #noteInput {
+                min-height: 100px;
+                padding: 1rem;
+            }
+            
+            .btn {
+                padding: 0.75rem 1rem;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <h1>Мой блокнот 📝</h1>
-        
+        <header class="header">
+            <h1 class="title">Dark Notes</h1>
+            <button class="btn btn-primary" id="addNoteBtn">
+                <i class="fas fa-plus"></i>
+                <span>New</span>
+            </button>
+        </header>
+
         <div class="input-area">
             <textarea 
                 id="noteInput" 
-                placeholder="Введите вашу заметку..."
+                placeholder="Type your note here..."
             ></textarea>
-            <button id="addNoteBtn">Добавить</button>
+            <div class="button-group">
+                <button class="btn" id="saveNoteBtn">
+                    <i class="fas fa-save"></i>
+                    <span>Save</span>
+                </button>
+            </div>
         </div>
 
-        <div id="notesContainer"></div>
+        <div class="notes-list" id="notesContainer"></div>
     </div>
 
-    <script src="app.js"></script>
+    <script>
+        // JavaScript остаётся аналогичным предыдущей версии
+        // с изменениями в обработчике создания заметок:
+        function createNoteElement(note, index) {
+            const noteElement = document.createElement('div');
+            noteElement.className = 'note';
+            noteElement.innerHTML = `
+                <div class="note-actions">
+                    <button class="note-action" onclick="deleteNote(${index})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+                <p class="note-content">${note.text}</p>
+                <small class="note-date">${new Date(note.date).toLocaleString()}</small>
+            `;
+            return noteElement;
+        }
+    </script>
 </body>
 </html>
