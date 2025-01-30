@@ -57,3 +57,16 @@ window.deleteNote = function(index) {
 
 // Запуск при загрузке страницы
 displayNotes();
+
+// Автоматическое увеличение высоты textarea
+noteInput.addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = this.scrollHeight + 'px';
+});
+
+// Скрытие клавиатуры при клике вне поля ввода
+document.addEventListener('click', function(e) {
+    if(e.target !== noteInput) {
+        noteInput.blur();
+    }
+});
