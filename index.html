@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dark Minimalist Notebook</title>
-    <!-- Font Awesome для иконок -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
@@ -15,48 +14,55 @@
             --text-secondary: #b3b3b3;
         }
 
-        body {
-            font-family: 'Segoe UI', system-ui, sans-serif;
+        * {
             margin: 0;
             padding: 0;
-            background-color: var(--bg-color);
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg-color);
             color: var(--text-primary);
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         .container {
-            max-width: 100%;
-            padding: 1rem;
+            flex: 1;
+            max-width: 800px;
             margin: 0 auto;
+            padding: 2rem 1rem;
+            display: flex;
+            flex-direction: column;
         }
 
         .header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            text-align: center;
             margin-bottom: 2rem;
-            padding: 1rem 0;
-            border-bottom: 1px solid #404040;
         }
 
         .title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin: 0;
-            color: var(--text-primary);
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
         }
 
-        .input-area {
-            position: relative;
-            margin-bottom: 1.5rem;
+        .input-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin: 2rem 0;
         }
 
         #noteInput {
             width: 100%;
-            min-height: 120px;
+            min-height: 150px;
             padding: 1.5rem;
             background: var(--surface-color);
-            border: none;
+            border: 2px solid #3a3a3a;
             border-radius: 12px;
             color: var(--text-primary);
             font-size: 1rem;
@@ -67,31 +73,28 @@
 
         #noteInput:focus {
             outline: none;
-            box-shadow: 0 0 0 2px var(--primary-color);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 15px rgba(124, 77, 255, 0.3);
         }
 
         .button-group {
             display: flex;
-            gap: 0.5rem;
-            margin-top: 1rem;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
         }
 
         .btn {
-            padding: 1rem 1.5rem;
+            padding: 0.8rem 1.5rem;
             border: none;
             border-radius: 8px;
-            background: var(--surface-color);
-            color: var(--text-primary);
+            background: var(--primary-color);
+            color: white;
             display: flex;
             align-items: center;
             gap: 0.5rem;
             cursor: pointer;
             transition: all 0.2s ease;
-        }
-
-        .btn-primary {
-            background: var(--primary-color);
-            color: white;
         }
 
         .btn:hover {
@@ -101,7 +104,8 @@
 
         .notes-list {
             display: grid;
-            gap: 1rem;
+            gap: 1.5rem;
+            margin-top: 2rem;
         }
 
         .note {
@@ -116,12 +120,13 @@
             margin: 0;
             color: var(--text-primary);
             line-height: 1.4;
+            white-space: pre-wrap;
         }
 
         .note-date {
             font-size: 0.875rem;
             color: var(--text-secondary);
-            margin-top: 0.5rem;
+            margin-top: 1rem;
         }
 
         .note-actions {
@@ -150,18 +155,29 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        @media (max-width: 480px) {
+        @media (max-width: 768px) {
             .container {
-                padding: 0.5rem;
+                padding: 1rem;
             }
             
             #noteInput {
-                min-height: 100px;
+                min-height: 120px;
                 padding: 1rem;
             }
             
             .btn {
                 padding: 0.75rem 1rem;
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .title {
+                font-size: 1.5rem;
+            }
+            
+            .note {
+                padding: 1rem;
             }
         }
     </style>
@@ -169,32 +185,37 @@
 <body>
     <div class="container">
         <header class="header">
-            <h1 class="title">Dark Notes</h1>
-            <button class="btn btn-primary" id="addNoteBtn">
-                <i class="fas fa-plus"></i>
-                <span>New</span>
-            </button>
+            <h1 class="title"><i class="fas fa-book-open"></i> Smart Notes</h1>
         </header>
 
-        <div class="input-area">
+        <div class="input-wrapper">
             <textarea 
                 id="noteInput" 
-                placeholder="Type your note here..."
+                placeholder="Начните вводить вашу заметку..."
             ></textarea>
-            <div class="button-group">
-                <button class="btn" id="saveNoteBtn">
-                    <i class="fas fa-save"></i>
-                    <span>Save</span>
-                </button>
-            </div>
+        </div>
+
+        <div class="button-group">
+            <button class="btn" id="addNoteBtn">
+                <i class="fas fa-plus"></i>
+                Сохранить
+            </button>
         </div>
 
         <div class="notes-list" id="notesContainer"></div>
     </div>
 
     <script>
-        // JavaScript остаётся аналогичным предыдущей версии
-        // с изменениями в обработчике создания заметок:
+        const noteInput = document.getElementById('noteInput');
+        const addNoteBtn = document.getElementById('addNoteBtn');
+        const notesContainer = document.getElementById('notesContainer');
+        
+        let notes = JSON.parse(localStorage.getItem('notes')) || [];
+
+        function saveNotes() {
+            localStorage.setItem('notes', JSON.stringify(notes));
+        }
+
         function createNoteElement(note, index) {
             const noteElement = document.createElement('div');
             noteElement.className = 'note';
@@ -204,11 +225,57 @@
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
-                <p class="note-content">${note.text}</p>
+                <pre class="note-content">${note.text}</pre>
                 <small class="note-date">${new Date(note.date).toLocaleString()}</small>
             `;
             return noteElement;
         }
+
+        function displayNotes() {
+            notesContainer.innerHTML = '';
+            notes.forEach((note, index) => {
+                notesContainer.appendChild(createNoteElement(note, index));
+            });
+        }
+
+        addNoteBtn.addEventListener('click', () => {
+            const noteText = noteInput.value.trim();
+            
+            if (noteText) {
+                const newNote = {
+                    text: noteText,
+                    date: new Date().toISOString()
+                };
+                
+                notes.push(newNote);
+                saveNotes();
+                displayNotes();
+                noteInput.value = '';
+                
+                // Анимация скролла к новой заметке
+                notesContainer.lastElementChild.scrollIntoView({
+                    behavior: 'smooth'
+                });
+            }
+        });
+
+        // Автоматическое увеличение высоты текстового поля
+        noteInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = this.scrollHeight + 'px';
+        });
+
+        // Загрузка заметок при старте
+        displayNotes();
+
+        // Глобальная функция для удаления
+        window.deleteNote = function(index) {
+            if (confirm('Удалить эту заметку?')) {
+                notes.splice(index, 1);
+                saveNotes();
+                displayNotes();
+            }
+        };
     </script>
 </body>
 </html>
