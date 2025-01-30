@@ -224,15 +224,31 @@
         <div class="notes-list" id="notesContainer"></div>
     </div>
 
+    <!-- Звуковые эффекты -->
+    <audio id="addSound" src="https://assets.mixkit.co/active_storage/sfx/2213/2213-preview.mp3"></audio>
+    <audio id="deleteSound" src="https://assets.mixkit.co/active_storage/sfx/2747/2747-preview.mp3"></audio>
+
     <script>
         const noteInput = document.getElementById('noteInput');
         const addNoteBtn = document.getElementById('addNoteBtn');
         const notesContainer = document.getElementById('notesContainer');
+        const addSound = document.getElementById('addSound');
+        const deleteSound = document.getElementById('deleteSound');
         
         let notes = JSON.parse(localStorage.getItem('notes')) || [];
 
         function saveNotes() {
             localStorage.setItem('notes', JSON.stringify(notes));
+        }
+
+        function playAddSound() {
+            addSound.currentTime = 0;
+            addSound.play().catch(error => console.log('Ошибка воспроизведения: ', error));
+        }
+
+        function playDeleteSound() {
+            deleteSound.currentTime = 0;
+            deleteSound.play().catch(error => console.log('Ошибка воспроизведения: ', error));
         }
 
         function createNoteElement(note, index) {
@@ -261,6 +277,7 @@
             const noteText = noteInput.value.trim();
             
             if (noteText) {
+                playAddSound();
                 const newNote = {
                     text: noteText,
                     date: new Date().toISOString()
@@ -286,6 +303,7 @@
 
         window.deleteNote = function(index) {
             if (confirm('Удалить эту заметку?')) {
+                playDeleteSound();
                 notes.splice(index, 1);
                 saveNotes();
                 displayNotes();
